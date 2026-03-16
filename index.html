@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Del Manuel Cruz — Data Analyst Portfolio</title>
+<meta name="description" content="Data Analyst portfolio — SQL, Tableau, Excel, Python, financial dashboards, and business intelligence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:60px}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#F8FAFC;color:#0F172A;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;line-height:1.5}
+::selection{background:#1D4ED8;color:#fff}
+a{transition:opacity 0.15s}
+a:hover{opacity:0.82}
+button{font-family:inherit}
+button:hover{opacity:0.88}
+button:active{transform:scale(0.97)}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#F8FAFC}
+::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#94A3B8}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script>
+(function () {
+  var e = React.createElement;
+  var useState = React.useState;
+  var useEffect = React.useEffect;
+
+  // ── Design tokens ─────────────────────────────
+  var C = {
+    bg:          '#F8FAFC',
+    white:       '#FFFFFF',
+    text:        '#0F172A',
+    textBody:    '#334155',
+    textMuted:   '#64748B',
+    accent:      '#1D4ED8',
+    accentMid:   '#2563EB',
+    accentLight: '#EFF6FF',
+    accentDark:  '#1E3A5F',
+    green:       '#166534',
+    greenBg:     '#F0FDF4',
+    greenMid:    '#15803D',
+    purple:      '#5B21B6',
+    purpleBg:    '#F5F3FF',
+    teal:        '#0F766E',
+    tealBg:      '#F0FDFA',
+    orange:      '#9A3412',
+    orangeBg:    '#FFF7ED',
+    border:      '#E2E8F0',
+    borderMid:   '#CBD5E1',
+    shadow:      '0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04)',
+    shadowMd:    '0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)',
+    shadowLg:    '0 12px 28px rgba(0,0,0,0.09), 0 4px 8px rgba(0,0,0,0.05)'
+  };
+
+  // ── Reusable: section wrapper ─────────────────
+  function Section(props) {
+    return e('section', {
+      id: props.id,
+      style: {
+        padding: '72px 0',
+        borderBottom: props.noBorder ? 'none' : '1px solid ' + C.border,
+        background: props.alt ? '#F1F5F9' : C.bg
+      }
+    },
+      e('div', { style: { maxWidth: 940, margin: '0 auto', padding: '0 28px' } },
+        props.label && e('div', {
+          style: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 36 }
+        },
+          e('div', { style: { width: 4, height: 26, borderRadius: 2, background: C.accentMid } }),
+          e('h2', { style: { fontSize: 22, fontWeight: 700, color: C.text, margin: 0 } }, props.label)
+        ),
+        props.children
+      )
+    );
+  }
+
+  // ── Reusable: pill tag ────────────────────────
+  function Tag(props) {
+    return e('span', {
+      style: {
+        display: 'inline-block', padding: '5px 13px', borderRadius: 20,
+        fontSize: 12, fontWeight: 500,
+        background: props.bg || C.accentLight,
+        color: props.color || C.accent,
+        margin: '0 6px 7px 0', letterSpacing: '0.1px'
+      }
+    }, props.text);
+  }
+
+  // ── Reusable: stat box ─────────────────────────
+  function Stat(props) {
+    return e('div', { style: { textAlign: 'center', flex: '1 1 0', minWidth: 70 } },
+      e('div', { style: { fontSize: 24, fontWeight: 800, color: props.color || C.accentMid, lineHeight: 1 } }, props.value),
+      e('div', { style: { fontSize: 10, color: C.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 4 } }, props.label)
+    );
+  }
+
+  // ── Reusable: project card ────────────────────
+  function ProjectCard(props) {
+    var hov = useState(false); var isHov = hov[0]; var setHov = hov[1];
+    return e('div', {
+      style: {
+        background: C.white, borderRadius: 14, overflow: 'hidden',
+        boxShadow: isHov ? C.shadowLg : C.shadow,
+        border: '1px solid ' + (isHov ? C.borderMid : C.border),
+        transform: isHov ? 'translateY(-3px)' : '',
+        transition: 'all 0.25s ease',
+        display: 'flex', flexDirection: 'column'
+      },
+      onMouseEnter: function () { setHov(true); },
+      onMouseLeave: function () { setHov(false); }
+    },
+      // Banner
+      e('div', {
+        style: {
+          background: props.gradient, padding: '30px 26px',
+          position: 'relative', overflow: 'hidden'
+        }
+      },
+        e('div', { style: { position: 'absolute', top: -30, right: -30, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' } }),
+        e('div', { style: { position: 'absolute', bottom: -40, left: '35%', width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' } }),
+        e('div', { style: { position: 'relative', zIndex: 1 } },
+          e('span', { style: { fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '1.5px' } }, props.type),
+          e('h3', { style: { fontSize: 20, fontWeight: 700, color: '#fff', margin: '8px 0 0', lineHeight: 1.3 } }, props.title)
+        )
+      ),
+      // Body
+      e('div', { style: { padding: '22px 26px', flex: 1, display: 'flex', flexDirection: 'column' } },
+        e('p', { style: { fontSize: 13.5, lineHeight: 1.75, color: C.textBody, marginBottom: 20 } }, props.description),
+        // Stats
+        e('div', { style: { display: 'flex', gap: 12, padding: '14px 0', borderTop: '1px solid ' + C.border, borderBottom: '1px solid ' + C.border, marginBottom: 18 } },
+          props.stats.map(function (s, i) { return e(Stat, { key: i, value: s.value, label: s.label, color: props.statColor }); })
+        ),
+        // Tech
+        e('div', { style: { marginBottom: 20 } },
+          props.tech.map(function (t, i) {
+            return e('span', {
+              key: i,
+              style: {
+                display: 'inline-block', padding: '3px 9px', borderRadius: 5,
+                fontSize: 11, fontWeight: 600, color: C.textMuted,
+                background: '#F8FAFC', border: '1px solid ' + C.border,
+                margin: '0 5px 5px 0', fontFamily: 'monospace'
+              }
+            }, t);
+          })
+        ),
+        // Buttons
+        e('div', { style: { display: 'flex', gap: 10, marginTop: 'auto' } },
+          props.links.map(function (link, i) {
+            return e('a', {
+              key: i, href: link.url, target: '_blank', rel: 'noopener noreferrer',
+              style: {
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                textDecoration: 'none',
+                background: i === 0 ? C.accentMid : C.white,
+                color: i === 0 ? '#fff' : C.accentMid,
+                border: i === 0 ? 'none' : '1px solid ' + C.accentMid,
+                transition: 'opacity 0.15s'
+              }
+            }, link.label);
+          })
+        )
+      )
+    );
+  }
+
+  // ── Reusable: timeline entry ──────────────────
+  function Job(props) {
+    return e('div', { style: { display: 'flex', gap: 20, marginBottom: 36 } },
+      // Dot + line
+      e('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'center', width: 20, flexShrink: 0 } },
+        e('div', {
+          style: {
+            width: 13, height: 13, borderRadius: '50%', flexShrink: 0,
+            background: props.current ? C.accentMid : C.borderMid,
+            boxShadow: props.current ? '0 0 0 4px ' + C.accentLight : 'none',
+            marginTop: 4
+          }
+        }),
+        e('div', { style: { width: 2, flex: 1, background: C.border, marginTop: 5 } })
+      ),
+      // Content
+      e('div', { style: { flex: 1 } },
+        e('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 6, marginBottom: 4 } },
+          e('div', null,
+            e('h4', { style: { fontSize: 15, fontWeight: 700, color: C.text, margin: 0 } }, props.role),
+            e('div', { style: { fontSize: 13.5, fontWeight: 600, color: C.accentMid, marginTop: 2 } }, props.company)
+          ),
+          e('div', { style: { textAlign: 'right' } },
+            e('div', {
+              style: {
+                fontSize: 12, fontWeight: 600, color: C.textMuted,
+                background: '#F1F5F9', padding: '3px 10px', borderRadius: 6
+              }
+            }, props.period),
+            props.location && e('div', { style: { fontSize: 11, color: C.textMuted, marginTop: 3, textAlign: 'right' } }, props.location)
+          )
+        ),
+        e('ul', { style: { paddingLeft: 16, marginTop: 8 } },
+          props.bullets.map(function (b, i) {
+            return e('li', {
+              key: i,
+              style: { fontSize: 13, lineHeight: 1.75, color: C.textBody, marginBottom: 3 }
+            }, b);
+          })
+        )
+      )
+    );
+  }
+
+  // ════════════════════════════════════════════════
+  // MAIN APP
+  // ════════════════════════════════════════════════
+  function App() {
+    var activeState = useState('');
+    var active = activeState[0]; var setActive = activeState[1];
+
+    useEffect(function () {
+      function onScroll() {
+        var ids = ['about','skills','projects','experience','education','contact'];
+        var cur = '';
+        ids.forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el && el.getBoundingClientRect().top < 140) cur = id;
+        });
+        setActive(cur);
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+      return function () { window.removeEventListener('scroll', onScroll); };
+    }, []);
+
+    function go(id) {
+      var el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    var navItems = [
+      { id: 'about',      label: 'About'      },
+      { id: 'skills',     label: 'Skills'     },
+      { id: 'projects',   label: 'Projects'   },
+      { id: 'experience', label: 'Experience' },
+      { id: 'education',  label: 'Education'  },
+      { id: 'contact',    label: 'Contact'    }
+    ];
+
+    return e('div', { style: { minHeight: '100vh', background: C.bg } },
+
+      // ── NAV ─────────────────────────────────────
+      e('nav', {
+        style: {
+          position: 'sticky', top: 0, zIndex: 100, height: 54,
+          background: 'rgba(255,255,255,0.93)', backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid ' + C.border,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 28px'
+        }
+      },
+        e('span', { style: { fontSize: 13, fontWeight: 700, color: C.text, letterSpacing: '-0.3px' } }, 'Del Manuel Cruz'),
+        e('div', { style: { display: 'flex', gap: 2 } },
+          navItems.map(function (n) {
+            var isActive = active === n.id;
+            return e('button', {
+              key: n.id, onClick: function () { go(n.id); },
+              style: {
+                padding: '6px 14px', borderRadius: 6, border: 'none', cursor: 'pointer',
+                fontSize: 13, fontWeight: isActive ? 600 : 400,
+                color: isActive ? C.accentMid : C.textMuted,
+                background: isActive ? C.accentLight : 'transparent',
+                transition: 'all 0.15s'
+              }
+            }, n.label);
+          })
+        )
+      ),
+
+      // ── HERO ────────────────────────────────────
+      e('div', {
+        style: {
+          background: 'linear-gradient(135deg, #0F2044 0%, #1A3A5F 45%, #1D4ED8 100%)',
+          padding: '96px 28px 80px', textAlign: 'center', position: 'relative', overflow: 'hidden'
+        }
+      },
+        // Decorative circles
+        e('div', { style: { position: 'absolute', top: '5%', left: '3%', width: 320, height: 320, borderRadius: '50%', background: 'rgba(255,255,255,0.025)', pointerEvents: 'none' } }),
+        e('div', { style: { position: 'absolute', bottom: '-20%', right: '8%', width: 450, height: 450, borderRadius: '50%', background: 'rgba(255,255,255,0.018)', pointerEvents: 'none' } }),
+        e('div', { style: { position: 'relative', zIndex: 1, maxWidth: 680, margin: '0 auto' } },
+          // Avatar
+          e('div', {
+            style: {
+              width: 88, height: 88, borderRadius: '50%', margin: '0 auto 22px',
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
+              border: '2px solid rgba(255,255,255,0.2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 28, fontWeight: 800, color: 'rgba(255,255,255,0.9)',
+              letterSpacing: '-1px'
+            }
+          }, 'DC'),
+          e('h1', { style: { fontSize: 44, fontWeight: 800, color: '#fff', margin: '0 0 6px', letterSpacing: '-0.8px' } }, 'Del Manuel Cruz'),
+          e('p', { style: { fontSize: 17, fontWeight: 500, color: 'rgba(255,255,255,0.65)', margin: '0 0 8px' } }, 'Data Analyst'),
+          e('p', { style: { fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: '0 0 22px' } }, '📍 Fort Lauderdale, FL'),
+          e('p', {
+            style: { fontSize: 14.5, lineHeight: 1.75, color: 'rgba(255,255,255,0.55)', maxWidth: 560, margin: '0 auto 28px' }
+          }, 'Results-driven Data Analyst turning complex datasets into actionable insights — from interactive financial dashboards to automated reporting systems that accelerate decision-making.'),
+          // CTA row
+          e('div', { style: { display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap' } },
+            e('button', {
+              onClick: function () { go('projects'); },
+              style: {
+                padding: '10px 26px', borderRadius: 8, border: 'none',
+                background: '#fff', color: C.accentDark,
+                fontSize: 14, fontWeight: 700, cursor: 'pointer'
+              }
+            }, '→ View Projects'),
+            e('a', {
+              href: 'https://www.linkedin.com/in/delmanuelcruz/',
+              target: '_blank', rel: 'noopener noreferrer',
+              style: {
+                padding: '10px 26px', borderRadius: 8,
+                border: '1px solid rgba(255,255,255,0.25)',
+                background: 'transparent', color: 'rgba(255,255,255,0.85)',
+                fontSize: 14, fontWeight: 600, textDecoration: 'none'
+              }
+            }, 'LinkedIn Profile')
+          ),
+          // Cert badges
+          e('div', { style: { display: 'flex', justifyContent: 'center', gap: 10, marginTop: 22, flexWrap: 'wrap' } },
+            ['Google Data Analytics', 'Google Business Intelligence'].map(function (cert) {
+              return e('span', {
+                key: cert,
+                style: {
+                  fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.6)',
+                  background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
+                  padding: '4px 12px', borderRadius: 20, letterSpacing: '0.2px'
+                }
+              }, '✓ ' + cert);
+            })
+          )
+        )
+      ),
+
+      // ── ABOUT ───────────────────────────────────
+      e(Section, { id: 'about', label: 'About Me' },
+        e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 300px', gap: 36, alignItems: 'start' } },
+          e('div', null,
+            e('p', { style: { fontSize: 14.5, lineHeight: 1.85, color: C.textBody, marginBottom: 16 } },
+              'I\'m a Data Analyst with hands-on experience translating complex datasets into actionable insights for operations, finance, and supply chain stakeholders. At NEO Architectural Lighting, I design and maintain Excel-based reporting infrastructure, build dynamic KPI dashboards, and analyze operational data to surface trends that drive business decisions.'
+            ),
+            e('p', { style: { fontSize: 14.5, lineHeight: 1.85, color: C.textBody, marginBottom: 16 } },
+              'Previously at Pharmsource Wholesale, I managed data oversight for 514 pharmacy accounts in Oracle NetSuite CRM, boosted reporting speed by 35% through Excel automation, and improved demand forecasting accuracy by 15% through order trend analysis.'
+            ),
+            e('p', { style: { fontSize: 14.5, lineHeight: 1.85, color: C.textBody } },
+              'I\'m certified in Google Data Analytics and Google Business Intelligence, and currently working toward Microsoft Power BI (DA-100) certification. I believe the best analysis is the kind that makes non-technical stakeholders say "I finally understand what\'s happening with our data."'
+            )
+          ),
+          e('div', { style: { background: C.accentLight, borderRadius: 12, padding: 22, border: '1px solid #BFDBFE' } },
+            e('h4', { style: { fontSize: 12, fontWeight: 700, color: C.accentMid, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 16 } }, 'Quick Facts'),
+            [
+              ['📍 Location',     'Fort Lauderdale, FL'],
+              ['💼 Current Role', 'Data Analyst @ NEO Architectural Lighting'],
+              ['🎓 Education',    'BA International Relations, FIU'],
+              ['📜 Certified',    'Google Data Analytics & BI'],
+              ['⚙️ In Progress',   'Power BI DA-100, Python for Data Analysis']
+            ].map(function (pair, i) {
+              return e('div', { key: i, style: { marginBottom: 13, paddingBottom: 13, borderBottom: i < 4 ? '1px solid #DBEAFE' : 'none' } },
+                e('div', { style: { fontSize: 11, fontWeight: 600, color: '#93C5FD', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: 2 } }, pair[0]),
+                e('div', { style: { fontSize: 13, fontWeight: 500, color: C.accentDark } }, pair[1])
+              );
+            })
+          )
+        )
+      ),
+
+      // ── SKILLS ──────────────────────────────────
+      e(Section, { id: 'skills', label: 'Skills & Certifications', alt: true },
+        e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20 } },
+
+          e('div', { style: { background: C.white, borderRadius: 12, padding: 22, border: '1px solid ' + C.border, boxShadow: C.shadow } },
+            e('div', { style: { fontSize: 22, marginBottom: 10 } }, '📊'),
+            e('h4', { style: { fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 14 } }, 'Data & Analysis'),
+            ['SQL', 'Tableau', 'Google Analytics', 'KPI Dashboard Design', 'Data Storytelling', 'Demand Forecasting', 'Business Intelligence'].map(function (s) {
+              return e(Tag, { key: s, text: s });
+            })
+          ),
+
+          e('div', { style: { background: C.white, borderRadius: 12, padding: 22, border: '1px solid ' + C.border, boxShadow: C.shadow } },
+            e('div', { style: { fontSize: 22, marginBottom: 10 } }, '🛠️'),
+            e('h4', { style: { fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 14 } }, 'Tools & Software'),
+            ['Advanced Excel', 'Pivot Tables', 'VLOOKUP / XLOOKUP', 'Power Query', 'VBA Macros', 'Oracle NetSuite CRM', 'Python (In Progress)', 'Power BI (In Progress)'].map(function (s) {
+              return e(Tag, { key: s, text: s, bg: C.greenBg, color: C.greenMid });
+            })
+          ),
+
+          e('div', { style: { background: C.white, borderRadius: 12, padding: 22, border: '1px solid ' + C.border, boxShadow: C.shadow } },
+            e('div', { style: { fontSize: 22, marginBottom: 10 } }, '🤝'),
+            e('h4', { style: { fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 14 } }, 'Business & Operations'),
+            ['Cross-functional Collaboration', 'Stakeholder Reporting', 'Process Automation', 'Supply Chain Analytics', 'CRM Data Management', 'AI Tools (Gemini, ChatGPT)', 'MS Office Suite'].map(function (s) {
+              return e(Tag, { key: s, text: s, bg: C.purpleBg, color: C.purple });
+            })
+          )
+        ),
+
+        // Certifications banner
+        e('div', {
+          style: {
+            marginTop: 20, padding: '18px 24px', borderRadius: 12,
+            background: C.white, border: '1px solid ' + C.border,
+            display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap'
+          }
+        },
+          e('span', { style: { fontSize: 12, fontWeight: 700, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.8px' } }, 'Certifications'),
+          e('div', { style: { width: 1, height: 20, background: C.border } }),
+          [
+            { text: '✓ Google Data Analytics — Coursera', color: C.greenMid, bg: C.greenBg },
+            { text: '✓ Google Business Intelligence — Coursera', color: C.greenMid, bg: C.greenBg },
+            { text: '⟳ Microsoft Power BI DA-100 — In Progress', color: C.orange, bg: C.orangeBg },
+            { text: '⟳ Python for Data Analysis — In Progress', color: C.orange, bg: C.orangeBg }
+          ].map(function (cert, i) {
+            return e('span', {
+              key: i,
+              style: {
+                fontSize: 12, fontWeight: 600, padding: '4px 12px',
+                borderRadius: 20, color: cert.color, background: cert.bg
+              }
+            }, cert.text);
+          })
+        )
+      ),
+
+      // ── PROJECTS ────────────────────────────────
+      e(Section, { id: 'projects', label: 'Featured Projects' },
+        e('p', { style: { fontSize: 14, color: C.textMuted, marginBottom: 28, marginTop: -20 } },
+          'Built as portfolio demonstrations using completely fictional sample data — no proprietary business information disclosed.'
+        ),
+        e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 22 } },
+
+          e(ProjectCard, {
+            type: 'Data Management Tool',
+            title: 'NYC Specifier & Contact Database',
+            gradient: 'linear-gradient(135deg, #0F2044 0%, #1D4ED8 100%)',
+            description: 'Interactive database application managing 450+ NYC architectural firms across 5 firm types (architects, lighting designers, interior designers, engineers, contractors) with 1,191 individual contacts. Features real-time search, multi-criteria filtering by borough and firm type, and a summary analytics dashboard.',
+            stats: [
+              { value: '450', label: 'Firms' },
+              { value: '1,191', label: 'Contacts' },
+              { value: '5', label: 'Firm Types' }
+            ],
+            statColor: '#1D4ED8',
+            tech: ['React 18', 'Python', 'openpyxl', 'GitHub Pages'],
+            links: [
+              { label: '→ Live Demo', url: 'https://delmanuelcruz-wq.github.io/yc-specifier-list/' },
+              { label: '↗ GitHub', url: 'https://github.com/delmanuelcruz-wq/yc-specifier-list' }
+            ]
+          }),
+
+          e(ProjectCard, {
+            type: 'Financial Analysis Dashboard',
+            title: 'Cost Reconciliation Dashboard',
+            gradient: 'linear-gradient(135deg, #064E3B 0%, #059669 100%)',
+            description: 'End-to-end financial dashboard analyzing $1.98M in YTD sales vs budget targets, gross margin performance across 6 product segments, and 179 invoice-level records. Includes sortable/searchable invoice drill-down, GM% health indicators, and one-click CSV export for stakeholder reporting.',
+            stats: [
+              { value: '$1.98M', label: 'YTD Sales' },
+              { value: '52.8%', label: 'GM%' },
+              { value: '179', label: 'Invoices' }
+            ],
+            statColor: '#059669',
+            tech: ['React 18', 'Python', 'openpyxl', 'GitHub Pages'],
+            links: [
+              { label: '→ Live Demo', url: 'https://delmanuelcruz-wq.github.io/lumen-cost-reconciliation/' },
+              { label: '↗ GitHub', url: 'https://github.com/delmanuelcruz-wq/lumen-cost-reconciliation' }
+            ]
+          })
+        )
+      ),
+
+      // ── EXPERIENCE ──────────────────────────────
+      e(Section, { id: 'experience', label: 'Work Experience', alt: true },
+        e('div', { style: { maxWidth: 760 } },
+
+          e(Job, {
+            role: 'Data Analyst',
+            company: 'NEO Architectural Lighting',
+            period: 'Jan 2026 – Present',
+            location: 'Fort Lauderdale, FL',
+            current: true,
+            bullets: [
+              'Design and maintain Excel-based reporting infrastructure — pivot tables, XLOOKUP, and dynamic charts — to track KPIs across customer service, finance, and supply chain operations',
+              'Analyze operational and financial datasets to surface trends, demand patterns, and service inefficiencies, delivering synthesized summaries and visual dashboards for leadership',
+              'Partner cross-functionally with operations, finance, and customer-facing teams to align reporting with business objectives and decision-making timelines',
+              'Identify workflow bottlenecks and propose automation enhancements that reduce manual processing time and increase reporting accuracy'
+            ]
+          }),
+
+          e(Job, {
+            role: 'Account Manager — Data Operations',
+            company: 'Pharmsource Wholesale',
+            period: 'Jun 2025 – Dec 2025',
+            location: 'Sunrise, FL',
+            current: false,
+            bullets: [
+              'Managed data oversight for 514 pharmacy accounts in Oracle NetSuite CRM, maintaining real-time accuracy across independent retail and long-term care pharmacy clients nationwide',
+              'Boosted reporting speed by 35% by designing dynamic Excel dashboards and VBA macros that automated account activity monitoring and eliminated manual report generation',
+              'Accelerated onboarding approval timelines by 20% through streamlined, template-driven Outlook workflows that reduced back-and-forth and standardized documentation',
+              'Improved demand forecasting accuracy by 15% by analyzing order frequency trends and identifying region-specific purchasing patterns to guide procurement planning',
+              'Produced weekly BI summaries that directly informed executive forecasting decisions; leveraged AI tools (Gemini, ChatGPT) to identify emerging market clusters'
+            ]
+          }),
+
+          e(Job, {
+            role: 'Data Analytics Fellow',
+            company: 'COOP Careers',
+            period: 'Aug 2024 – Dec 2024',
+            location: 'Miami, FL (Remote)',
+            current: false,
+            bullets: [
+              'Completed 200+ hours of applied analytics training in SQL, Tableau, and Excel with emphasis on business storytelling, KPI design, and stakeholder communication',
+              'Built dashboards and KPI trackers for case-study clients, simulating real marketing and operations analysis for business stakeholders',
+              'Completed three full-scale data projects — two collaborative (teams of 4) and one solo — demonstrating analytical rigor and team-based project delivery',
+              'Selected for a competitive fellowship program serving underrepresented talent in tech'
+            ]
+          })
+        )
+      ),
+
+      // ── EDUCATION ───────────────────────────────
+      e(Section, { id: 'education', label: 'Education' },
+        e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 } },
+          [
+            {
+              school: 'Florida International University',
+              degree: 'Bachelor of Arts — International Relations',
+              year: 'Graduated 2023',
+              location: 'Miami, FL',
+              color: C.accentMid, bg: C.accentLight, border: '#BFDBFE'
+            },
+            {
+              school: 'Broward College',
+              degree: 'Associate of Science — Business Management',
+              year: 'Graduated 2019',
+              location: 'Fort Lauderdale, FL',
+              color: C.teal, bg: C.tealBg, border: '#99F6E4'
+            }
+          ].map(function (ed, i) {
+            return e('div', {
+              key: i,
+              style: {
+                background: ed.bg, border: '1px solid ' + ed.border,
+                borderRadius: 12, padding: '22px 24px'
+              }
+            },
+              e('div', { style: { fontSize: 26, marginBottom: 10 } }, i === 0 ? '🎓' : '🏛️'),
+              e('h4', { style: { fontSize: 15, fontWeight: 700, color: C.text, margin: '0 0 4px' } }, ed.school),
+              e('p', { style: { fontSize: 13.5, fontWeight: 500, color: ed.color, margin: '0 0 6px' } }, ed.degree),
+              e('div', { style: { display: 'flex', justifyContent: 'space-between' } },
+                e('span', { style: { fontSize: 12, color: C.textMuted } }, ed.location),
+                e('span', { style: { fontSize: 12, fontWeight: 600, color: C.textMuted } }, ed.year)
+              )
+            );
+          })
+        )
+      ),
+
+      // ── CONTACT ─────────────────────────────────
+      e(Section, { id: 'contact', label: 'Get in Touch', noBorder: true },
+        e('div', { style: { maxWidth: 520, margin: '0 auto', textAlign: 'center' } },
+          e('p', { style: { fontSize: 15, lineHeight: 1.8, color: C.textBody, marginBottom: 32 } },
+            "I'm actively looking for Data Analyst, Business Analyst, and BI Analyst opportunities. If you're working on a team that values data-driven decisions, let's talk."
+          ),
+          e('div', { style: { display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' } },
+            e('a', {
+              href: 'mailto:delmanuelcruz@gmail.com',
+              style: {
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '13px 32px', borderRadius: 10, background: C.accentMid,
+                color: '#fff', fontSize: 15, fontWeight: 600, textDecoration: 'none',
+                width: '100%', maxWidth: 340, justifyContent: 'center',
+                boxShadow: '0 2px 8px rgba(37,99,235,0.3)'
+              }
+            }, '✉  delmanuelcruz@gmail.com'),
+            e('a', {
+              href: 'https://www.linkedin.com/in/delmanuelcruz/',
+              target: '_blank', rel: 'noopener noreferrer',
+              style: {
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '13px 32px', borderRadius: 10,
+                border: '1px solid ' + C.border, background: C.white,
+                color: C.text, fontSize: 15, fontWeight: 600, textDecoration: 'none',
+                width: '100%', maxWidth: 340, justifyContent: 'center'
+              }
+            }, '🔗  linkedin.com/in/delmanuelcruz'),
+            e('a', {
+              href: 'https://github.com/delmanuelcruz-wq',
+              target: '_blank', rel: 'noopener noreferrer',
+              style: {
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '13px 32px', borderRadius: 10,
+                border: '1px solid ' + C.border, background: C.white,
+                color: C.text, fontSize: 15, fontWeight: 600, textDecoration: 'none',
+                width: '100%', maxWidth: 340, justifyContent: 'center'
+              }
+            }, '◆  github.com/delmanuelcruz-wq')
+          )
+        )
+      ),
+
+      // ── FOOTER ──────────────────────────────────
+      e('footer', { style: { background: '#0F2044', padding: '20px 28px', textAlign: 'center' } },
+        e('p', { style: { color: 'rgba(255,255,255,0.3)', fontSize: 12 } },
+          'Del Manuel Cruz · Data Analyst · Fort Lauderdale, FL · delmanuelcruz@gmail.com · ' + new Date().getFullYear()
+        )
+      )
+    );
+  }
+
+  var root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(e(App));
+})();
+
+</script>
+</body>
+</html>
